@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import requests
 import urllib
 import wget
@@ -38,6 +39,7 @@ for link in links:
 		new_links.append(link)
 
 # download all files
+os.makedirs('download/', exist_ok=True)
 for link in new_links:
 	print('Getting link from real-debrid...')
 	response = requests.post(url=API_ENDPOINT_LINK, headers=HEADERS, data={'link': link})
@@ -48,6 +50,6 @@ for link in new_links:
 		sys.exit("Error: " + jsonResponse['error'])
 	downloadUrlunq = urllib.parse.unquote(downloadUrl)
 	print('Downloading with wget...')
-	wget.download(downloadUrlunq)
+	wget.download(downloadUrlunq, 'download/')
 	print()
 print('Success!')
