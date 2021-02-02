@@ -12,7 +12,10 @@ API_ENDPOINT_FOLDER = "https://api.real-debrid.com/rest/1.0/unrestrict/folder"
 HEADERS = {'Authorization': "Bearer " + API_KEY}
 
 # getting inputs
-arg=sys.argv[1]
+try:
+	arg=sys.argv[1]
+except IndexError:
+	sys.exit("Error: please input an argument")
 if '.txt' in arg:
 	try:
 		with open(arg) as f:
