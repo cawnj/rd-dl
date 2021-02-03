@@ -18,13 +18,15 @@ try:
 except IndexError:
 	sys.exit("Error: please input an argument")
 if '.txt' in arg:
+	file = arg
 	try:
-		with open(arg) as f:
+		with open(file) as f:
 			links = f.readlines()
 		links = [x.strip() for x in links]
 	except FileNotFoundError:
 		sys.exit("Error: file not found")
 else:
+	file = 'links.txt'
 	links = [arg]
 
 # converting folder to files if needed
@@ -33,23 +35,48 @@ for link in links:
 	if 'folder' in link:
 		response = requests.post(url=API_ENDPOINT_FOLDER, headers=HEADERS, data={'link': link})
 		jsonResponse = response.json()
-		for file in jsonResponse:
-			new_links.append(file)
+		for item in jsonResponse:
+			new_links.append(item)
 	else:
 		new_links.append(link)
+# add all links to file
+with open(file, 'w') as f:
+	for link in new_links:
+		f.write("%s\n" % link)
 
 # download all files
 os.makedirs('download/', exist_ok=True)
 for link in new_links:
-	print('Getting link from real-debrid...')
-	response = requests.post(url=API_ENDPOINT_LINK, headers=HEADERS, data={'link': link})
+	print('\nGetting link from real-debrid...')
+	try:
+		response = requests.post(url=API_ENDPOINT_LINK, headers=HEADERS, data={'link': link})
+	except requests.exceptions.RequestException as e:
+		print(link)
+		raise SystemExit(e)
 	jsonResponse = response.json()
 	try:
 		downloadUrl = jsonResponse['download']
 	except KeyError:
 		sys.exit("Error: " + jsonResponse['error'])
 	downloadUrlunq = urllib.parse.unquote(downloadUrl)
-	print('Downloading with wget...')
-	wget.download(downloadUrlunq, 'download/')
-	print()
+	filename = downloadUrlunq.split('/')[-1]
+	print(link)
+	print(filename)
+	if os.path.exists('download/' + filename):
+		print('File already exists, skipping...')
+	else:
+		print('Downloading with wget...')
+		try:
+			wget.download(downloadUrlunq, 'download/')
+		except requests.exceptions.RequestException as e:
+			print(link)
+			raise SystemExit(e)
+		print()
+	# remove link from file
+	with open(file, "r") as f:
+    		lines = f.readlines()
+	with open(file, "w") as f:
+    		for line in lines:
+        		if line.strip("\n") != link:
+            			f.write(line)
 print('Success!')
