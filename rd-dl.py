@@ -32,7 +32,7 @@ else:
 # converting folder to files if needed
 new_links=[]
 for link in links:
-	if 'folder' in link:
+	if '/folder/' in link or '/#F!' in link:
 		response = requests.post(url=API_ENDPOINT_FOLDER, headers=HEADERS, data={'link': link})
 		jsonResponse = response.json()
 		for item in jsonResponse:
