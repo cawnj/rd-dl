@@ -1,7 +1,7 @@
 # rd-dl
-A quick and dirty CLI downloader for Real-Debrid  
+A quick and dirty CLI downloader for Real-Debrid I made for personal use.
 
-**NOTE**: I don't use this anymore, it's super broken and buggy.  
+**NOTE**: I don't use this anymore, as it is unreliable and there are better solutions available.  
 My current solution is clicking "View generated links" on the RD site and running those links through aria2, it's an extra step but much easier and cleaner.
 
 ## Usage
